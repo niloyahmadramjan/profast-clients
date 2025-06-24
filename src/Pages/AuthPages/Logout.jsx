@@ -1,0 +1,43 @@
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router";
+import AuthUser from "../../Hook/AuthUser";
+import Swal from "sweetalert2";
+
+const Logout = () => {
+  const { signOutUser } = AuthUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    signOutUser()
+      .then(() => {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Log out successful!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        // Redirect to homepage or login
+        setTimeout(() => navigate("/"), 1600);
+      })
+      .catch((error) => {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: error.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        // Optional: redirect anyway or stay on page
+        setTimeout(() => navigate("/"), 1600);
+      });
+  }, [signOutUser, navigate]);
+
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <p className="text-lg text-gray-600">Logging out...</p>
+    </div>
+  );
+};
+
+export default Logout;
