@@ -8,6 +8,8 @@ import ForgerPassword from "../Pages/AuthPages/ForgetPassword";
 import Logout from "../Pages/AuthPages/Logout";
 import Coverage from "../Pages/coverageMap/Coverage";
 import LoadingAnimation from "../Pages/LoadingAnimation";
+import AddParcel from "../Pages/AddParcel";
+import PrivateRoutes from "./PrivateRoutes";
 
 export const router = createBrowserRouter([
   {
@@ -20,9 +22,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "/coverage",
-        loader: ()=>fetch('/districts.json'),
+        loader: () => fetch("/districts.json"),
         hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
         Component: Coverage,
+      },
+      {
+        path: "/addparcel",
+        element: <PrivateRoutes><AddParcel></AddParcel></PrivateRoutes>,
+        loader: () => fetch("/districts.json"),
+        hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
       },
     ],
   },
