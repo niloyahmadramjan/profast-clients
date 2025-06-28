@@ -10,6 +10,11 @@ import Coverage from "../Pages/coverageMap/Coverage";
 import LoadingAnimation from "../Pages/LoadingAnimation";
 import AddParcel from "../Pages/AddParcel";
 import PrivateRoutes from "./PrivateRoutes";
+import Dashboard from "../Layout/Dashboard";
+import DashboardHome from "../Pages/UserDashBoard/DashboardHome";
+import MyParcels from "../Pages/UserDashBoard/MyParcels";
+import MyProfile from "../Pages/UserDashBoard/MyProfile";
+import Payment from "../Pages/UserDashBoard/Payment/payment";
 
 export const router = createBrowserRouter([
   {
@@ -28,9 +33,30 @@ export const router = createBrowserRouter([
       },
       {
         path: "/addparcel",
-        element: <PrivateRoutes><AddParcel></AddParcel></PrivateRoutes>,
+        element: (
+          <PrivateRoutes>
+            <AddParcel></AddParcel>
+          </PrivateRoutes>
+        ),
         loader: () => fetch("/districts.json"),
         hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <PrivateRoutes>
+        <Dashboard />
+      </PrivateRoutes>
+    ),
+    children: [
+      { path: "/dashboard/home", element: <DashboardHome /> },
+      { path: "/dashboard/myparcels", element: <MyParcels /> },
+      { path: "/dashboard/profile", element: <MyProfile /> },
+      {
+        path: "/dashboard/payment/:parcelId",
+        Component: Payment,
       },
     ],
   },

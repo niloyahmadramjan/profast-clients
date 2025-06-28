@@ -5,7 +5,7 @@ import animationData from "../assets/animations/loading.json";
 
 const LoadingAnimation = () => {
   return (
-    <div className="flex items-center justify-center ">
+    <div className=" w-full h-screen flex items-center justify-center ">
       <Lottie animationData={animationData} loop={true} />
     </div>
   );

@@ -4,8 +4,10 @@ import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { useLoaderData } from "react-router";
 import useAxiosSecure from "../Hook/UseAxiosSecure";
+import AuthUser from "../Hook/AuthUser";
 
 const AddParcel = () => {
+  const { user } = AuthUser();
   const districtsData = useLoaderData();
   const axiosSecure = useAxiosSecure();
   const { register, handleSubmit, watch, setValue, reset } = useForm();
@@ -66,6 +68,8 @@ const AddParcel = () => {
     const trackingNumber = generateTrackingNumber();
 
     const parcelData = {
+      name: user.displayName,
+      email: user.email,
       ...data,
       parcelType,
       cost,
@@ -116,6 +120,7 @@ const AddParcel = () => {
         axiosSecure
           .post("/parcels", parcelData)
           .then((result) => {
+            console.log(result);
             if (result.data.insertedId) {
               reset();
               Swal.fire({
