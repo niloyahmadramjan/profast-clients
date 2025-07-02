@@ -9,7 +9,13 @@ import Logout from "../Pages/AuthPages/Logout";
 import Coverage from "../Pages/coverageMap/Coverage";
 import LoadingAnimation from "../Pages/LoaderAnimation/LoadingAnimation";
 import AddParcel from "../Pages/AddParcel";
-import PrivateRoutes from "./PrivateRoutes";
+
+// Route guards
+import PrivateRoutes from "./PrivateRoutes"; // for all logged in users
+import AdminRoute from "./AdminRoute"; // for admin
+// import RiderRoute from "./RiderRoute"; // for riders
+
+// Dashboard layouts and pages
 import Dashboard from "../Layout/Dashboard";
 import DashboardHome from "../Pages/UserDashBoard/DashboardHome";
 import MyParcels from "../Pages/UserDashBoard/MyParcels";
@@ -18,6 +24,11 @@ import Payment from "../Pages/UserDashBoard/Payment/payment";
 import PaymentHistory from "../Pages/UserDashBoard/PaymentHistory";
 import RiderApplicationForm from "../Pages/RiderApplicationForm";
 import MyApplication from "../Pages/UserDashBoard/Riders/MyApplication";
+import AllRiders from "../Pages/UserDashBoard/Riders/AllRider";
+import ActiveRiders from "../Pages/UserDashBoard/Riders/ActiveRiders";
+import PendingRider from "../Pages/UserDashBoard/Riders/PendingRider";
+import AdminManagement from "../Pages/UserDashBoard/Riders/AdminManagement ";
+import Unauthorized from "../Pages/Unauthorized";
 
 export const router = createBrowserRouter([
   {
@@ -26,55 +37,34 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: Home,
+        Component: Home, // 🌐 Public Route
       },
       {
         path: "/coverage",
         loader: () => fetch("/districts.json"),
-        hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
+        hydrateFallbackElement: <LoadingAnimation />, // 🌐 Public Route
         Component: Coverage,
       },
       {
         path: "/addparcel",
         element: (
-          <PrivateRoutes>
-            <AddParcel></AddParcel>
+          <PrivateRoutes> {/* ✅ Logged in user route */}
+            <AddParcel />
           </PrivateRoutes>
         ),
         loader: () => fetch("/districts.json"),
-        hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
+        hydrateFallbackElement: <LoadingAnimation />,
       },
       {
         path: "/riderApplicationForm",
-        element: <PrivateRoutes><RiderApplicationForm></RiderApplicationForm></PrivateRoutes>,
+        element: (
+          <PrivateRoutes> {/* ✅ Any logged-in user can apply */}
+            <RiderApplicationForm />
+          </PrivateRoutes>
+        ),
         loader: () => fetch("/districts.json"),
-        hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
-      }
-    ],
-  },
-  {
-    path: "/dashboard",
-    element: (
-      <PrivateRoutes>
-        <Dashboard />
-      </PrivateRoutes>
-    ),
-    children: [
-      { path: "home", element: <DashboardHome /> },
-      { path: "myparcels", element: <MyParcels /> },
-      { path: "profile", element: <MyProfile /> },
-      {
-        path: "payment/:parcelId",
-        Component: Payment,
+        hydrateFallbackElement: <LoadingAnimation />,
       },
-      {
-        path: "paymentHistory",
-        Component: PaymentHistory,
-      },
-      {
-        path: 'myApplication',
-        Component: MyApplication
-      }
     ],
   },
   {
@@ -83,20 +73,51 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/login",
-        Component: Login,
+        Component: Login, // 🌐 Public
       },
       {
         path: "register",
-        Component: Register,
+        Component: Register, // 🌐 Public
       },
       {
         path: "/forgerPassword",
-        Component: ForgerPassword,
+        Component: ForgerPassword, // 🌐 Public
       },
     ],
   },
   {
     path: "/logout",
-    Component: Logout,
+    Component: Logout, // ✅ Private route (user must be logged in)
+  },
+  {
+    path: '/unauthorized',
+    Component: Unauthorized
+  },
+
+  {
+    path: "/dashboard",
+    element: (
+      <PrivateRoutes> {/* ✅ Only logged-in users can access dashboard */}
+        <Dashboard />
+      </PrivateRoutes>
+    ),
+    children: [
+      { path: "home", element: <DashboardHome /> }, // ✅ All logged-in users
+      { path: "myparcels", element: <PrivateRoutes><MyParcels /></PrivateRoutes> },
+      { path: "myApplication", element: <PrivateRoutes><MyApplication /></PrivateRoutes> },
+      { path: "payment/:parcelId", element: <PrivateRoutes><Payment /></PrivateRoutes> },
+      { path: "paymentHistory", element: <PrivateRoutes><PaymentHistory /></PrivateRoutes> },
+      { path: "profile", element: <PrivateRoutes><MyProfile /></PrivateRoutes> },
+
+      // ✅ Admin-only routes
+      { path: "allRider", element: <AdminRoute><AllRiders /></AdminRoute> },
+      { path: "activeRider", element: <AdminRoute><ActiveRiders /></AdminRoute> },
+      { path: "pendingRider", element: <AdminRoute><PendingRider /></AdminRoute> },
+      { path: "adminManagement", element: <AdminRoute><AdminManagement /></AdminRoute> },
+
+      // 🔐 Optionally, you can add rider-only routes later using RiderRoute
+      // Example:
+      // { path: "riderTasks", element: <RiderRoute><RiderTasks /></RiderRoute> },
+    ],
   },
 ]);

@@ -54,7 +54,6 @@ const Login = () => {
         name: user.displayName,
         email: user.email,
         photo: user.photoURL,
-        role: "user",
       };
 
       // ✅ Save/Upsert to MongoDB

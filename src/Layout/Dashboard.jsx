@@ -1,48 +1,95 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router";
 import {
   FaHome,
   FaClipboardList,
   FaUserCircle,
-  FaBars,
+  FaUsers,
+  FaUserCheck,
+  FaUserClock,
+  FaMoneyCheckAlt,
+  FaBox,
 } from "react-icons/fa";
 import AuthUser from "../Hook/AuthUser";
+import { FaBars } from "react-icons/fa6";
+import useAxiosSecure from "../Hook/UseAxiosSecure";
 
 const Dashboard = () => {
   const { user } = AuthUser();
+  const [role, setRole] = useState(null);
+  const [checking, setChecking] = useState(true); // extra loader check
+  const axiosSecure = useAxiosSecure();
 
+  useEffect(() => {
+    if (user?.email) {
+      axiosSecure
+        .get(`/users/${user.email}`)
+        .then((res) => {
+          setRole(res.data.role);
+          setChecking(false);
+        })
+        .catch(() => {
+          setChecking(false);
+        });
+    } else {
+      setChecking(false);
+    }
+  }, [user?.email, axiosSecure]);
+
+  if (checking) {
+    return <p>Loading...</p>;
+  }
   return (
-    <div className="min-h-screen flex">
-      {/* ✅ Vertical Sidebar for Desktop */}
-      <div className="hidden lg:flex flex-col w-64 bg-base-200 p-4 space-y-2">
+    <div className="min-h-screen w-full flex">
+      {/* ✅ Fixed Vertical Sidebar for Desktop */}
+      <div className="hidden lg:flex flex-col w-64 fixed top-0 left-0 h-full inset-0 bg-opacity-40 backdrop-blur-sm bg-base-200 shadow-md p-4 z-30">
         <h2 className="text-xl font-bold mb-4">Dashboard</h2>
         <Link to="home" className="btn btn-ghost justify-start">
           <FaHome className="mr-2" /> Dashboard Home
         </Link>
+
         <Link to="myparcels" className="btn btn-ghost justify-start">
-          <FaClipboardList className="mr-2" /> My Parcels
+          <FaBox className="mr-2" /> My Parcels
         </Link>
-        <Link
-          to="paymentHistory"
-          className="btn btn-ghost justify-start"
-        >
-          <FaClipboardList className="mr-2" /> Payment History
+
+        <Link to="myApplication" className="btn btn-ghost justify-start">
+          <FaUserCircle className="mr-2" /> My Application
         </Link>
-        <Link to="profile" className="btn btn-ghost justify-start">
-          <FaUserCircle className="mr-2" /> My Profile
+
+        <Link to="paymentHistory" className="btn btn-ghost justify-start">
+          <FaMoneyCheckAlt className="mr-2" /> Payment History
         </Link>
+        {role === "admin" ? (
+          <>
+            <Link to="adminManagement" className="btn btn-ghost justify-start">
+              <FaHome className="mr-2" /> Admin Management
+            </Link>
+            <Link to="allRider" className="btn btn-ghost justify-start">
+              <FaUsers className="mr-2" /> All Riders
+            </Link>
+            <Link to="activeRider" className="btn btn-ghost justify-start">
+              <FaUserCheck className="mr-2" /> Active Riders
+            </Link>
+            <Link to="pendingRider" className="btn btn-ghost justify-start">
+              <FaUserClock className="mr-2" /> Pending Riders
+            </Link>
+          </>
+        ) : (
+          ""
+        )}
+
         <Link to="/" className="btn btn-ghost justify-start">
           <FaHome className="mr-2" /> Profast Home
         </Link>
-        <Link to="myApplication" className="btn btn-ghost justify-start">
-          <FaHome className="mr-2" /> My Application
+        <Link to="/logOut" className="btn btn-ghost justify-start">
+          <FaHome className="mr-2" /> Log Out
         </Link>
       </div>
 
-      {/* ✅ Main content */}
-      <div className="flex-1">
-        {/* ✅ Top Navbar for Mobile */}
-        <div className="navbar bg-base-100 shadow-sm px-4 flex justify-between lg:hidden">
+      {/* ✅ Main Content Area */}
+      <div className="flex-1 lg:ml-64 w-full">
+        {/* ✅ Top Navbar for Mobile Only */}
+        <div className="navbar inset-0 bg-opacity-40 backdrop-blur-sm shadow-sm px-4 flex justify-between lg:hidden sticky top-0 z-40">
           <label htmlFor="mobile-drawer" className="btn btn-ghost btn-circle">
             <FaBars className="text-xl" />
           </label>
@@ -61,54 +108,118 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* ✅ Main page content */}
-        <div className="p-4">
+        {/* ✅ Main Page Content */}
+        <div className="p-4 min-h-[calc(100vh-64px)] overflow-auto">
           <Outlet />
         </div>
-      </div>
-
-      {/* ✅ Mobile Drawer (already working) */}
-      <div className="drawer drawer-start lg:hidden z-50">
-        <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-side">
-          <label htmlFor="mobile-drawer" className="drawer-overlay"></label>
-          <ul className="menu p-4 w-64 min-h-full bg-base-200 text-base-content">
-            <li>
-              <Link
-                to="/dashboard/home"
-                onClick={() =>
-                  (document.getElementById("mobile-drawer").checked = false)
-                }
-              >
-                <FaHome className="mr-2" /> Dashboard Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dashboard/myparcels"
-                onClick={() =>
-                  (document.getElementById("mobile-drawer").checked = false)
-                }
-              >
-                <FaClipboardList className="mr-2" /> My Parcels
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dashboard/profile"
-                onClick={() =>
-                  (document.getElementById("mobile-drawer").checked = false)
-                }
-              >
-                <FaUserCircle className="mr-2" /> My Profile
-              </Link>
-            </li>
-            <li>
-              <Link to="/">
-                <FaHome className="mr-2" /> Profast Home
-              </Link>
-            </li>
-          </ul>
+        {/* ✅ Mobile Drawer Navigation */}
+        <div className="drawer drawer-start lg:hidden z-50">
+          <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
+          <div className="drawer-side">
+            <label htmlFor="mobile-drawer" className="drawer-overlay"></label>;
+            <ul className="menu p-2 w-52 max-w-xs min-h-full text-black font-bold backdrop-blur-sm z-50">
+              <li>
+                <Link
+                  to="home"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaHome className="mr-2" /> Dashboard Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="adminManagement "
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaHome className="mr-2" /> Admin Management
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="myparcels"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaBox className="mr-2" /> My Parcels
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="myApplication"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaUserCircle className="mr-2" /> My Application
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="paymentHistory"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaMoneyCheckAlt className="mr-2" /> Payment History
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="allRider"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaUsers className="mr-2" /> All Rider
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="activeRider"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaUserCheck className="mr-2" /> Active Rider
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="pendingRider"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaUserClock className="mr-2" /> Pending Rider
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaHome className="mr-2" /> Profast Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/logout"
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaHome className="mr-2" /> Log Out
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

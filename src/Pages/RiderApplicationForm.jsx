@@ -45,7 +45,7 @@ const RiderApplicationForm = () => {
       Swal.fire({
         icon: "error",
         title: "Submission Failed",
-        text: err.message,
+        text: err?.response?.data?.message || "You cannot apply again.",
       });
     }
   };

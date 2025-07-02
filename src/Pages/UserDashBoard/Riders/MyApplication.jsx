@@ -3,6 +3,9 @@ import Swal from "sweetalert2";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hook/UseAxiosSecure";
 import AuthUser from "../../../Hook/AuthUser";
+import LoadingAnimation from "../../LoaderAnimation/LoadingAnimation";
+
+
 
 const MyApplication = () => {
   const axiosSecure = useAxiosSecure();
@@ -14,7 +17,7 @@ const MyApplication = () => {
     queryKey: ["riderApplication", user?.email],
     enabled: !!user?.email,
     queryFn: async () => {
-      const res = await axiosSecure.get(`/riders/user/${user.email}`);
+      const res = await axiosSecure.get(`/riders/${user.email}`);
       return res.data;
     },
   });
@@ -22,7 +25,7 @@ const MyApplication = () => {
   // ❌ Mutation for deleting application
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      return await axiosSecure.delete(`/riders/user/${user.email}`);
+      return await axiosSecure.delete(`/riders/${user.email}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["riderApplication"]);
@@ -47,10 +50,10 @@ const MyApplication = () => {
     }
   };
 
-  if (isLoading) return <div className="text-center p-10">Loading...</div>;
+  if (isLoading) return <LoadingAnimation></LoadingAnimation>
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
+    <div className="w-full mx-auto p-6 bg-white rounded-lg shadow">
       <h2 className="text-2xl font-bold mb-4">My Rider Application</h2>
 
       {!application ? (

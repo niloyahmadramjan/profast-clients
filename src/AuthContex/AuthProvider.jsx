@@ -12,6 +12,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../../firebaseAuth";
+import axios from "axios";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -63,10 +64,12 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
