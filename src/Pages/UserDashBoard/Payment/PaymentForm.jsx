@@ -3,7 +3,7 @@ import useAxiosSecure from "../../../Hook/UseAxiosSecure";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import LoadingAnimation from "../../LoadingAnimation";
+import LoadingAnimation from "../../LoaderAnimation/LoadingAnimation";
 import Swal from "sweetalert2";
 import AuthUser from "../../../Hook/AuthUser";
 
@@ -88,7 +88,7 @@ const PaymentForm = () => {
         }
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setMessage("❌ Something went wrong. Try again later.");
     } finally {
       setLoading(false);
@@ -121,7 +121,7 @@ const PaymentForm = () => {
                 base: {
                   fontSize: "16px",
                   color: "#333",
-                  '::placeholder': {
+                  "::placeholder": {
                     color: "#a0aec0",
                   },
                 },

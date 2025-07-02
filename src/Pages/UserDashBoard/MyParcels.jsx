@@ -10,7 +10,7 @@ import {
 import useAxiosSecure from "../../Hook/UseAxiosSecure";
 import Swal from "sweetalert2";
 import AuthUser from "../../Hook/AuthUser";
-import LoadingAnimation from "../LoadingAnimation";
+import LoadingAnimation from "../LoaderAnimation/LoadingAnimation";
 import { useNavigate } from "react-router";
 
 const MyParcels = () => {
@@ -104,6 +104,7 @@ const MyParcels = () => {
         <table className="table w-full">
           <thead className="bg-gray-100 text-base">
             <tr>
+              <th>#</th>
               <th>Parcel</th>
               <th>Sender</th>
               <th>Receiver</th>
@@ -115,8 +116,9 @@ const MyParcels = () => {
             </tr>
           </thead>
           <tbody>
-            {parcels.map((parcel) => (
+            {parcels.map((parcel, index) => (
               <tr key={parcel._id}>
+                <td>{index + 1}</td>
                 <td>{parcel.parcelName}</td>
                 <td>
                   {parcel.senderName} ({parcel.senderDistrict},{" "}

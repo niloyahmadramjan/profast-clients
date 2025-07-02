@@ -22,39 +22,6 @@ const Navbar = () => {
         </NavLink>
       </li>
 
-      {user && (
-        <>
-          <li>
-            <NavLink
-              to="/addparcel"
-              className={({ isActive }) =>
-                `transition-colors duration-200 font-medium ${
-                  isActive
-                    ? "text-lime-500"
-                    : "text-gray-600 hover:text-lime-600"
-                }`
-              }
-            >
-              Add Parcel
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) =>
-                `transition-colors duration-200 font-medium ${
-                  isActive
-                    ? "text-lime-500"
-                    : "text-gray-600 hover:text-lime-600"
-                }`
-              }
-            >
-              Dashboard
-            </NavLink>
-          </li>
-        </>
-      )}
-
       <li>
         <NavLink
           to="/coverage"
@@ -93,7 +60,7 @@ const Navbar = () => {
       </li>
       <li>
         <NavLink
-          to="/be-a-rider"
+          to="/riderApplicationForm"
           className={({ isActive }) =>
             `transition-colors duration-200 font-medium ${
               isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
@@ -103,6 +70,38 @@ const Navbar = () => {
           Be a Rider
         </NavLink>
       </li>
+      {user && (
+        <>
+          <li>
+            <NavLink
+              to="/addparcel"
+              className={({ isActive }) =>
+                `transition-colors duration-200 font-medium ${
+                  isActive
+                    ? "text-lime-500"
+                    : "text-gray-600 hover:text-lime-600"
+                }`
+              }
+            >
+              Add Parcel
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `transition-colors duration-200 font-medium ${
+                  isActive
+                    ? "text-lime-500"
+                    : "text-gray-600 hover:text-lime-600"
+                }`
+              }
+            >
+              Dashboard
+            </NavLink>
+          </li>
+        </>
+      )}
     </>
   );
 
@@ -148,7 +147,7 @@ const Navbar = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-52"
+                className="hidden md:block menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-52"
               >
                 <li>
                   <Link to="/profile">Profile</Link>

@@ -1,67 +1,242 @@
-import React from "react";
-
-import ProFastLogo from "../ProFastLogo";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import AuthUser from "../../Hook/AuthUser";
+import ProFastLogo from "../ProFastLogo";
 import { Link } from "react-router";
+import axios from "axios";
+import AuthUser from "../../Hook/AuthUser";
+import RegLoading from "../LoaderAnimation/RegLoading";
+import UseAxios from "../../Hook/UseAxios";
+import useAxiosSecure from "../../Hook/UseAxiosSecure";
 
 const Register = () => {
-  const { signUpUserWithEmailPass } = AuthUser();
+  const {
+    signUpUserWithEmailPass,
+    updateUserProfile,
+    signInGithubPopup,
+    signInGooglePopup,
+  } = AuthUser();
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const Axios = UseAxios();
+  const axiosSecure = useAxiosSecure();
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => {
-    const { email, password } = data;
 
-    signUpUserWithEmailPass(email, password)
-      .then(() => {
-        reset();
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Registration has been successfull!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: error.message,
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      });
+  const handleImagePreview = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+    }
   };
+
+  const onSubmit = async (data) => {
+    setLoading(true); // 🌀 Show loader
+    const { name, email, password, image } = data;
+
+    try {
+      // 🔼 Upload to imgbb
+      const formData = new FormData();
+      formData.append("image", image[0]);
+
+      const imgbbApiKey = import.meta.env.VITE_imgbbApi_Key;
+
+      const { data: imgbbRes } = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,
+        formData
+      );
+      const imageUrl = imgbbRes.data.url;
+
+      // 🧩 Firebase Auth
+      await signUpUserWithEmailPass(email, password);
+      await updateUserProfile(name, imageUrl);
+
+      // 💾 Save to MongoDB
+      const newUser = {
+        name,
+        email,
+        photo: imageUrl,
+        role: "user",
+      };
+      await Axios.post("/users", newUser);
+
+      Swal.fire({
+        icon: "success",
+        title: "Registration successful!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      reset();
+      setPreview(null);
+    } catch (error) {
+      console.error("Registration error:", error);
+      Swal.fire({
+        icon: "error",
+        title: error.message || "Registration failed",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } finally {
+      setLoading(false); // ✅ Hide loader
+    }
+  };
+
+  // handle google popup login/reg
+  const handleRegGoogle = async () => {
+    setLoading(true); // 🌀 Show loader
+
+    try {
+      const result = await signInGooglePopup();
+      const user = result.user;
+
+      // ✅ Prepare user info
+      const userInfo = {
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+        role: "user",
+      };
+
+      // ✅ Save/Upsert to MongoDB
+      await Axios.post("/users", userInfo);
+
+      // ✅ Success toast
+      Swal.fire({
+        icon: "success",
+        title: "Login successful!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      // ✅ Optional: redirect or reset state
+      // navigate("/"); // or dashboard, if needed
+    } catch (error) {
+      console.error("Google login error:", error);
+      Swal.fire({
+        icon: "error",
+        title: error.message || "Google login failed",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } finally {
+      setLoading(false); // ✅ Hide loader
+    }
+  };
+
+  // handle github login/reg
+  const handleRegGithub = async () => {
+    setLoading(true); // 🌀 Show loader
+
+    try {
+      const result = await signInGithubPopup();
+      const user = result.user;
+
+      // ✅ Prepare user info
+      const userInfo = {
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+        role: "user",
+      };
+
+      // ✅ Save/Upsert to MongoDB
+      await axiosSecure.post("/users", userInfo);
+
+      // ✅ Success toast
+      Swal.fire({
+        icon: "success",
+        title: "Login successful!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      // ✅ Optional: redirect or reset state
+      // navigate("/"); // or dashboard, if needed
+    } catch (error) {
+      console.error("Google login error:", error);
+      Swal.fire({
+        icon: "error",
+        title: error.message || "Google login failed",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } finally {
+      setLoading(false); // ✅ Hide loader
+    }
+  };
+
+  if (loading) return <RegLoading />;
 
   return (
     <>
-      {/* Left Side - Form */}
       <div className="md:w-1/2 w-full px-6 md:px-16">
         <div className="pb-16 pt-5">
-          <ProFastLogo></ProFastLogo>
+          <ProFastLogo />
         </div>
 
         <h2 className="text-3xl font-bold mb-2">Create an Account</h2>
         <p className="text-gray-500 mb-6">Register with Profast</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* ✅ Profile image preview */}
+          <div className="flex flex-col items-center gap-2">
+            <div className="avatar">
+              <div className="w-24 rounded-full ring ring-lime-400 ring-offset-2">
+                <img
+                  src={
+                    preview ||
+                    "https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png"
+                  }
+                  alt="Preview"
+                />
+              </div>
+            </div>
+
+            <label className="form-control w-full max-w-xs">
+              <div className="label">
+                <span className="label-text font-semibold text-base">
+                  Upload Profile Image
+                </span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                {...register("image", { required: "Image is required" })}
+                className="file-input file-input-bordered file-input-primary w-full"
+                onChange={handleImagePreview}
+              />
+              {errors.image && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.image.message}
+                </p>
+              )}
+            </label>
+          </div>
+
+          {/* ✅ Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Name
             </label>
             <input
               type="text"
-              {...register("name", { required: true })}
-              placeholder="Email"
+              {...register("name", { required: "Name is required" })}
+              placeholder="Full Name"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-400"
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
           </div>
+
+          {/* ✅ Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -69,7 +244,7 @@ const Register = () => {
             <input
               type="email"
               {...register("email", {
-                required: true,
+                required: "Email is required",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: "Please enter a valid email address",
@@ -85,6 +260,7 @@ const Register = () => {
             )}
           </div>
 
+          {/* ✅ Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -92,15 +268,11 @@ const Register = () => {
             <input
               type="password"
               {...register("password", {
-                required: "password is required ",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
+                required: "Password is required",
+                minLength: { value: 6, message: "Minimum 6 characters" },
                 pattern: {
                   value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
-                  message:
-                    "Password must include at least one letter and one number",
+                  message: "Include at least one letter and one number",
                 },
               })}
               placeholder="Password"
@@ -113,6 +285,7 @@ const Register = () => {
             )}
           </div>
 
+          {/* ✅ Submit Button */}
           <button
             type="submit"
             className="w-full bg-lime-400 hover:bg-lime-500 text-white cursor-pointer py-2 rounded-md font-semibold transition"
@@ -133,26 +306,13 @@ const Register = () => {
 
         <div className="my-4 text-center text-gray-400 text-sm">Or</div>
 
-        {/* GitHub */}
+        {/* Social buttons */}
         <div className="flex flex-col gap-2 ">
-          <button className="btn bg-black text-white border-black">
-            <svg
-              aria-label="GitHub logo"
-              width="16"
-              height="16"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="white"
-                d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"
-              ></path>
-            </svg>
-            Register with GitHub
-          </button>
-
           {/* Google */}
-          <button className="btn bg-white text-black border-[#e5e5e5]">
+          <button
+            onClick={handleRegGoogle}
+            className="btn bg-white text-black border-[#e5e5e5]"
+          >
             <svg
               aria-label="Google logo"
               width="16"
@@ -180,7 +340,27 @@ const Register = () => {
                 ></path>
               </g>
             </svg>
-            Register with Google
+            Login with Google
+          </button>
+
+          {/* GitHub */}
+          <button
+            onClick={handleRegGithub}
+            className="btn bg-black text-white border-black"
+          >
+            <svg
+              aria-label="GitHub logo"
+              width="16"
+              height="16"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="white"
+                d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"
+              ></path>
+            </svg>
+            Login with GitHub
           </button>
         </div>
       </div>

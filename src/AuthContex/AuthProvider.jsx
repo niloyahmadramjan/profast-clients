@@ -9,6 +9,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../../firebaseAuth";
 
@@ -43,10 +44,18 @@ const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, gitHubProvider);
   };
 
-  // reset password 
-  const resetPassword = (email)=>{
-    return sendPasswordResetEmail(auth,email)
-  }
+  // update user profile
+  const updateUserProfile = (displayName, photoURL) => {
+    return updateProfile(auth.currentUser, {
+      displayName,
+      photoURL,
+    });
+  };
+
+  // reset password
+  const resetPassword = (email) => {
+    return sendPasswordResetEmail(auth, email);
+  };
 
   // user logout
   const signOutUser = () => {
@@ -66,6 +75,7 @@ const AuthProvider = ({ children }) => {
     loginUserWithEmailPass,
     signInGooglePopup,
     signInGithubPopup,
+    updateUserProfile,
     resetPassword,
     user,
     setUser,

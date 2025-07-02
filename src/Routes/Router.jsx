@@ -7,7 +7,7 @@ import Register from "../Pages/AuthPages/Register";
 import ForgerPassword from "../Pages/AuthPages/ForgetPassword";
 import Logout from "../Pages/AuthPages/Logout";
 import Coverage from "../Pages/coverageMap/Coverage";
-import LoadingAnimation from "../Pages/LoadingAnimation";
+import LoadingAnimation from "../Pages/LoaderAnimation/LoadingAnimation";
 import AddParcel from "../Pages/AddParcel";
 import PrivateRoutes from "./PrivateRoutes";
 import Dashboard from "../Layout/Dashboard";
@@ -15,6 +15,9 @@ import DashboardHome from "../Pages/UserDashBoard/DashboardHome";
 import MyParcels from "../Pages/UserDashBoard/MyParcels";
 import MyProfile from "../Pages/UserDashBoard/MyProfile";
 import Payment from "../Pages/UserDashBoard/Payment/payment";
+import PaymentHistory from "../Pages/UserDashBoard/PaymentHistory";
+import RiderApplicationForm from "../Pages/RiderApplicationForm";
+import MyApplication from "../Pages/UserDashBoard/Riders/MyApplication";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +44,12 @@ export const router = createBrowserRouter([
         loader: () => fetch("/districts.json"),
         hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
       },
+      {
+        path: "/riderApplicationForm",
+        element: <PrivateRoutes><RiderApplicationForm></RiderApplicationForm></PrivateRoutes>,
+        loader: () => fetch("/districts.json"),
+        hydrateFallbackElement: <LoadingAnimation></LoadingAnimation>,
+      }
     ],
   },
   {
@@ -51,13 +60,21 @@ export const router = createBrowserRouter([
       </PrivateRoutes>
     ),
     children: [
-      { path: "/dashboard/home", element: <DashboardHome /> },
-      { path: "/dashboard/myparcels", element: <MyParcels /> },
-      { path: "/dashboard/profile", element: <MyProfile /> },
+      { path: "home", element: <DashboardHome /> },
+      { path: "myparcels", element: <MyParcels /> },
+      { path: "profile", element: <MyProfile /> },
       {
-        path: "/dashboard/payment/:parcelId",
+        path: "payment/:parcelId",
         Component: Payment,
       },
+      {
+        path: "paymentHistory",
+        Component: PaymentHistory,
+      },
+      {
+        path: 'myApplication',
+        Component: MyApplication
+      }
     ],
   },
   {
