@@ -23,12 +23,13 @@ import MyProfile from "../Pages/UserDashBoard/MyProfile";
 import Payment from "../Pages/UserDashBoard/Payment/payment";
 import PaymentHistory from "../Pages/UserDashBoard/PaymentHistory";
 import RiderApplicationForm from "../Pages/RiderApplicationForm";
-import MyApplication from "../Pages/UserDashBoard/Riders/MyApplication";
-import AllRiders from "../Pages/UserDashBoard/Riders/AllRider";
-import ActiveRiders from "../Pages/UserDashBoard/Riders/ActiveRiders";
-import PendingRider from "../Pages/UserDashBoard/Riders/PendingRider";
-import AdminManagement from "../Pages/UserDashBoard/Riders/AdminManagement ";
+import MyApplication from "../Pages/UserDashBoard/Admin/MyApplication";
+import AllRiders from "../Pages/UserDashBoard/Admin/AllRider";
+import ActiveRiders from "../Pages/UserDashBoard/Admin/ActiveRiders";
+import PendingRider from "../Pages/UserDashBoard/Admin/PendingRider";
+import AdminManagement from "../Pages/UserDashBoard/Admin/AdminManagement ";
 import Unauthorized from "../Pages/Unauthorized";
+import PaidUnassignedParcels from "../Pages/UserDashBoard/Admin/PaidUnassignedParcels";
 
 export const router = createBrowserRouter([
   {
@@ -48,7 +49,9 @@ export const router = createBrowserRouter([
       {
         path: "/addparcel",
         element: (
-          <PrivateRoutes> {/* ✅ Logged in user route */}
+          <PrivateRoutes>
+            {" "}
+            {/* ✅ Logged in user route */}
             <AddParcel />
           </PrivateRoutes>
         ),
@@ -58,7 +61,9 @@ export const router = createBrowserRouter([
       {
         path: "/riderApplicationForm",
         element: (
-          <PrivateRoutes> {/* ✅ Any logged-in user can apply */}
+          <PrivateRoutes>
+            {" "}
+            {/* ✅ Any logged-in user can apply */}
             <RiderApplicationForm />
           </PrivateRoutes>
         ),
@@ -90,30 +95,103 @@ export const router = createBrowserRouter([
     Component: Logout, // ✅ Private route (user must be logged in)
   },
   {
-    path: '/unauthorized',
-    Component: Unauthorized
+    path: "/unauthorized",
+    Component: Unauthorized,
   },
 
   {
     path: "/dashboard",
     element: (
-      <PrivateRoutes> {/* ✅ Only logged-in users can access dashboard */}
+      <PrivateRoutes>
+        {" "}
+        {/* ✅ Only logged-in users can access dashboard */}
         <Dashboard />
       </PrivateRoutes>
     ),
     children: [
       { path: "home", element: <DashboardHome /> }, // ✅ All logged-in users
-      { path: "myparcels", element: <PrivateRoutes><MyParcels /></PrivateRoutes> },
-      { path: "myApplication", element: <PrivateRoutes><MyApplication /></PrivateRoutes> },
-      { path: "payment/:parcelId", element: <PrivateRoutes><Payment /></PrivateRoutes> },
-      { path: "paymentHistory", element: <PrivateRoutes><PaymentHistory /></PrivateRoutes> },
-      { path: "profile", element: <PrivateRoutes><MyProfile /></PrivateRoutes> },
+      {
+        path: "myparcels",
+        element: (
+          <PrivateRoutes>
+            <MyParcels />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "myApplication",
+        element: (
+          <PrivateRoutes>
+            <MyApplication />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "payment/:parcelId",
+        element: (
+          <PrivateRoutes>
+            <Payment />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "paymentHistory",
+        element: (
+          <PrivateRoutes>
+            <PaymentHistory />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <PrivateRoutes>
+            <MyProfile />
+          </PrivateRoutes>
+        ),
+      },
 
       // ✅ Admin-only routes
-      { path: "allRider", element: <AdminRoute><AllRiders /></AdminRoute> },
-      { path: "activeRider", element: <AdminRoute><ActiveRiders /></AdminRoute> },
-      { path: "pendingRider", element: <AdminRoute><PendingRider /></AdminRoute> },
-      { path: "adminManagement", element: <AdminRoute><AdminManagement /></AdminRoute> },
+      {
+        path: "allRider",
+        element: (
+          <AdminRoute>
+            <AllRiders />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "activeRider",
+        element: (
+          <AdminRoute>
+            <ActiveRiders />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "pendingRider",
+        element: (
+          <AdminRoute>
+            <PendingRider />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "adminManagement",
+        element: (
+          <AdminRoute>
+            <AdminManagement />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "paidUnassignedParcels",
+        element: (
+          <AdminRoute>
+            <PaidUnassignedParcels />
+          </AdminRoute>
+        ),
+      },
 
       // 🔐 Optionally, you can add rider-only routes later using RiderRoute
       // Example:

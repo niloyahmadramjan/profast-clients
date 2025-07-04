@@ -4,15 +4,18 @@ import ProFastLogo from "../ProFastLogo";
 import { useForm } from "react-hook-form";
 import AuthUser from "../../Hook/AuthUser";
 import Swal from "sweetalert2";
-import {  Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import useAxios from "../../Hook/UseAxios";
 import RegLoading from "../LoaderAnimation/RegLoading";
 
 const Login = () => {
-  const { loginUserWithEmailPass,signInGooglePopup,signInGithubPopup } = AuthUser();
-    const [loading, setLoading] = useState(false);
+  const { loginUserWithEmailPass, signInGooglePopup, signInGithubPopup } =
+    AuthUser();
+  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm();
   const Axios = useAxios();
+  const location = useLocation();
+  console.log(location);
 
   const navigate = useNavigate();
 
@@ -20,7 +23,7 @@ const Login = () => {
     const { email, password } = data;
     loginUserWithEmailPass(email, password)
       .then(() => {
-        reset()
+        reset();
         Swal.fire({
           position: "center",
           icon: "success",
@@ -28,7 +31,7 @@ const Login = () => {
           showConfirmButton: false,
           timer: 1500,
         });
-        navigate("/")
+        navigate(location.state || "/");
       })
       .catch((error) => {
         Swal.fire({
@@ -66,6 +69,7 @@ const Login = () => {
         timer: 1500,
         showConfirmButton: false,
       });
+       navigate(location.state || "/");
 
       // ✅ Optional: redirect or reset state
       // navigate("/"); // or dashboard, if needed
@@ -108,6 +112,7 @@ const Login = () => {
         timer: 1500,
         showConfirmButton: false,
       });
+       navigate(location.state || "/");
 
       // ✅ Optional: redirect or reset state
       // navigate("/"); // or dashboard, if needed
@@ -124,8 +129,7 @@ const Login = () => {
     }
   };
 
-    if (loading) return <RegLoading />;
-
+  if (loading) return <RegLoading />;
 
   return (
     <>
@@ -163,7 +167,10 @@ const Login = () => {
           </div>
 
           <div className="text-right text-sm">
-            <Link to="/forgerPassword" className="text-lime-600 hover:underline">
+            <Link
+              to="/forgerPassword"
+              className="text-lime-600 hover:underline"
+            >
               Forget Password?
             </Link>
           </div>
@@ -178,7 +185,10 @@ const Login = () => {
 
         <p className="mt-4 text-sm text-gray-600">
           Don’t have any account?{" "}
-          <Link to="/register" className="text-lime-600 hover:underline font-semibold">
+          <Link
+            to="/register"
+            className="text-lime-600 hover:underline font-semibold"
+          >
             Register
           </Link>
         </p>
@@ -187,7 +197,7 @@ const Login = () => {
 
         {/* GitHub */}
         <div className="flex flex-col gap-2 ">
-         <button
+          <button
             onClick={handleRegGoogle}
             className="btn bg-white text-black border-[#e5e5e5]"
           >

@@ -173,7 +173,7 @@ const Navbar = () => {
               Sign In
             </Link>
             <Link
-              to="/be-a-rider"
+              to="/riderApplicationForm"
               className="btn btn-success btn-sm rounded-md hidden md:flex"
             >
               Be a Rider

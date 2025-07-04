@@ -64,6 +64,12 @@ const Dashboard = () => {
             <Link to="adminManagement" className="btn btn-ghost justify-start">
               <FaHome className="mr-2" /> Admin Management
             </Link>
+            <Link
+              to="paidUnassignedParcels"
+              className="btn btn-ghost justify-start"
+            >
+              <FaUsers className="mr-2" /> Assigned Parcel
+            </Link>
             <Link to="allRider" className="btn btn-ghost justify-start">
               <FaUsers className="mr-2" /> All Riders
             </Link>
@@ -136,6 +142,16 @@ const Dashboard = () => {
                   }
                 >
                   <FaHome className="mr-2" /> Admin Management
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="paidUnassignedParcels "
+                  onClick={() =>
+                    (document.getElementById("mobile-drawer").checked = false)
+                  }
+                >
+                  <FaHome className="mr-2" /> Paid Unassigned Parcels
                 </Link>
               </li>
               <li>

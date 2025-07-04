@@ -22,7 +22,7 @@ const AdminManagement = () => {
     if (search.trim() === "") {
       refetch(); // fallback to default
     } else {
-      const res = await axiosSecure.get(`/users/search?q=${search}`);
+      const res = await axiosSecure.get(`/riders/search?q=${search}`);
       setUsers(res.data);
     }
   };

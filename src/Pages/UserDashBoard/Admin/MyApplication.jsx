@@ -80,13 +80,14 @@ const MyApplication = () => {
               </span>
             </p>
           </div>
-
-          <button
+              {
+                application.status === 'approved'? "":  <button
             onClick={handleDelete}
             className="mt-4 btn bg-red-500 hover:bg-red-600 text-white"
           >
             Delete Application
           </button>
+              }
         </div>
       )}
     </div>
