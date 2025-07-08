@@ -31,17 +31,26 @@ export default function ParcelAssignment() {
     enabled: !!selectedParcel,
   });
 
-  const handleAssign = async () => {
-    if (!selectedRiderId || !selectedParcel) return;
-    await axiosSecure.patch(`/parcels/assign/${selectedParcel._id}`, {
-      riderId: selectedRiderId,
-    });
-    await axiosSecure.patch(`/riders/busy/${selectedRiderId}`);
-    setSelectedParcel(null);
-    setSelectedRiderId("");
-    setSearch("");
-    refetch();
-  };
+ const handleAssign = async () => {
+  if (!selectedRiderId || !selectedParcel) return;
+
+  // Find the selected rider object from riders list
+  const selectedRider = riders.find(r => r._id === selectedRiderId);
+
+  await axiosSecure.patch(`/parcels/assign/${selectedParcel._id}`, {
+    riderId: selectedRiderId,
+    riderEmail: selectedRider?.email || "",
+  });
+
+  await axiosSecure.patch(`/riders/busy/${selectedRiderId}`);
+
+  // Reset state
+  setSelectedParcel(null);
+  setSelectedRiderId("");
+  setSearch("");
+  refetch();
+};
+
 
   return (
     <div className="p-4">

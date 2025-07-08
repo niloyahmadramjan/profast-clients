@@ -2,15 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 import useAxiosSecure from "../Hook/UseAxiosSecure";
 import AuthUser from "../Hook/AuthUser";
+import useTrackParcel from "../Hook/useTrackParcel";
 
 const AddParcel = () => {
   const { user } = AuthUser();
   const districtsData = useLoaderData();
   const axiosSecure = useAxiosSecure();
   const { register, handleSubmit, watch, setValue, reset } = useForm();
+  const updateTracking = useTrackParcel();
 
   const [senderAreas, setSenderAreas] = useState([]);
   const [receiverAreas, setReceiverAreas] = useState([]);
@@ -18,6 +20,7 @@ const AddParcel = () => {
 
   const senderDistrict = watch("senderDistrict");
   const receiverDistrict = watch("receiverDistrict");
+  const Navigate = useNavigate();
 
   // sender/receiver area set
   useEffect(() => {
@@ -119,17 +122,30 @@ const AddParcel = () => {
 
         axiosSecure
           .post("/parcels", parcelData)
-          .then((result) => {
-            console.log(result);
+          .then(async (result) => {
+            const parcelId = result.data.insertedId;
+             const trackingNumber = result.data.trackingNumber;
             if (result.data.insertedId) {
+              //parcel status update
+              await updateTracking({
+                parcelId: parcelId,
+                trackingNumber: trackingNumber,
+                status: "Order Placed",
+                location: `${senderDistrict} - ${senderAreas}`,
+                message:
+                  "Your parcel has been placed and is awaiting admin approval.",
+              });
+
               reset();
               Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "Your parcel successfully added",
+                title: "Your Parcel succefully Added!",
                 showConfirmButton: false,
                 timer: 1500,
               });
+
+              Navigate("/dashboard/myparcels");
             }
           })
           .catch((error) => {

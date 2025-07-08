@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, Outlet } from "react-router";
 import {
   FaHome,
@@ -9,36 +9,41 @@ import {
   FaUserClock,
   FaMoneyCheckAlt,
   FaBox,
+  FaGlobe,
+  FaSignOutAlt,
 } from "react-icons/fa";
-import AuthUser from "../Hook/AuthUser";
 import { FaBars } from "react-icons/fa6";
+import { useQuery } from "@tanstack/react-query";
+import AuthUser from "../Hook/AuthUser";
 import useAxiosSecure from "../Hook/UseAxiosSecure";
 
 const Dashboard = () => {
   const { user } = AuthUser();
-  const [role, setRole] = useState(null);
-  const [checking, setChecking] = useState(true); // extra loader check
   const axiosSecure = useAxiosSecure();
 
-  useEffect(() => {
-    if (user?.email) {
-      axiosSecure
-        .get(`/users/${user.email}`)
-        .then((res) => {
-          setRole(res.data.role);
-          setChecking(false);
-        })
-        .catch(() => {
-          setChecking(false);
-        });
-    } else {
-      setChecking(false);
-    }
-  }, [user?.email, axiosSecure]);
+  const {
+    data: userData,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["user-role", user?.email],
+    enabled: !!user?.email, // query runs only if email exists
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/users/${user.email}`);
+      return res.data;
+    },
+  });
 
-  if (checking) {
-    return <p>Loading...</p>;
+  if (isLoading) {
+    return <span className="loading loading-spinner text-error"></span>;
   }
+
+  if (isError) {
+    return <p className="text-center text-red-500">Failed to fetch role.</p>;
+  }
+
+  const role = userData?.role;
+
   return (
     <div className="min-h-screen w-full flex">
       {/* ✅ Fixed Vertical Sidebar for Desktop */}
@@ -59,36 +64,56 @@ const Dashboard = () => {
         <Link to="paymentHistory" className="btn btn-ghost justify-start">
           <FaMoneyCheckAlt className="mr-2" /> Payment History
         </Link>
-        {role === "admin" ? (
+
+        {role === "admin" && (
           <>
             <Link to="adminManagement" className="btn btn-ghost justify-start">
-              <FaHome className="mr-2" /> Admin Management
+              <FaClipboardList className="mr-2" /> Admin Management
             </Link>
+
             <Link
               to="paidUnassignedParcels"
               className="btn btn-ghost justify-start"
             >
-              <FaUsers className="mr-2" /> Assigned Parcel
+              <FaBox className="mr-2" /> Assigned Parcel
             </Link>
+
             <Link to="allRider" className="btn btn-ghost justify-start">
               <FaUsers className="mr-2" /> All Riders
             </Link>
+
             <Link to="activeRider" className="btn btn-ghost justify-start">
               <FaUserCheck className="mr-2" /> Active Riders
             </Link>
+
             <Link to="pendingRider" className="btn btn-ghost justify-start">
               <FaUserClock className="mr-2" /> Pending Riders
             </Link>
           </>
-        ) : (
-          ""
+        )}
+
+        {role === "rider" && (
+          <>
+            <Link to="rider-pickup" className="btn btn-ghost justify-start">
+              <FaClipboardList className="mr-2" /> Rider Task
+            </Link>
+            <Link to="rider-earning" className="btn btn-ghost justify-start">
+              <FaClipboardList className="mr-2" />
+              My Earning
+            </Link>
+            <Link to="total-earning" className="btn btn-ghost justify-start">
+              <FaClipboardList className="mr-2" />
+              My Total Earning
+            </Link>
+          </>
         )}
 
         <Link to="/" className="btn btn-ghost justify-start">
-          <FaHome className="mr-2" /> Profast Home
+          <FaGlobe className="mr-2" /> Profast Home
         </Link>
+
         <Link to="/logOut" className="btn btn-ghost justify-start">
-          <FaHome className="mr-2" /> Log Out
+          <FaSignOutAlt className="mr-2" /> Log Out
         </Link>
       </div>
 
@@ -118,12 +143,13 @@ const Dashboard = () => {
         <div className="p-4 min-h-[calc(100vh-64px)] overflow-auto">
           <Outlet />
         </div>
+
         {/* ✅ Mobile Drawer Navigation */}
-        <div className="drawer drawer-start lg:hidden z-50">
+        <div className="h-screen drawer drawer-start lg:hidden z-50 ">
           <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
           <div className="drawer-side">
-            <label htmlFor="mobile-drawer" className="drawer-overlay"></label>;
-            <ul className="menu p-2 w-52 max-w-xs min-h-full text-black font-bold backdrop-blur-sm z-50">
+            <label htmlFor="mobile-drawer" className="drawer-overlay"></label>
+            <ul className="menu p-2 w-52 max-w-xs h-screen text-black font-bold backdrop-blur-sm z-50">
               <li>
                 <Link
                   to="home"
@@ -134,26 +160,7 @@ const Dashboard = () => {
                   <FaHome className="mr-2" /> Dashboard Home
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="adminManagement "
-                  onClick={() =>
-                    (document.getElementById("mobile-drawer").checked = false)
-                  }
-                >
-                  <FaHome className="mr-2" /> Admin Management
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="paidUnassignedParcels "
-                  onClick={() =>
-                    (document.getElementById("mobile-drawer").checked = false)
-                  }
-                >
-                  <FaHome className="mr-2" /> Paid Unassigned Parcels
-                </Link>
-              </li>
+
               <li>
                 <Link
                   to="myparcels"
@@ -164,6 +171,7 @@ const Dashboard = () => {
                   <FaBox className="mr-2" /> My Parcels
                 </Link>
               </li>
+
               <li>
                 <Link
                   to="myApplication"
@@ -174,6 +182,7 @@ const Dashboard = () => {
                   <FaUserCircle className="mr-2" /> My Application
                 </Link>
               </li>
+
               <li>
                 <Link
                   to="paymentHistory"
@@ -184,36 +193,85 @@ const Dashboard = () => {
                   <FaMoneyCheckAlt className="mr-2" /> Payment History
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="allRider"
-                  onClick={() =>
-                    (document.getElementById("mobile-drawer").checked = false)
-                  }
-                >
-                  <FaUsers className="mr-2" /> All Rider
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="activeRider"
-                  onClick={() =>
-                    (document.getElementById("mobile-drawer").checked = false)
-                  }
-                >
-                  <FaUserCheck className="mr-2" /> Active Rider
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="pendingRider"
-                  onClick={() =>
-                    (document.getElementById("mobile-drawer").checked = false)
-                  }
-                >
-                  <FaUserClock className="mr-2" /> Pending Rider
-                </Link>
-              </li>
+
+              {role === "admin" && (
+                <>
+                  <li>
+                    <Link
+                      to="adminManagement"
+                      onClick={() =>
+                        (document.getElementById(
+                          "mobile-drawer"
+                        ).checked = false)
+                      }
+                    >
+                      <FaHome className="mr-2" /> Admin Management
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="paidUnassignedParcels"
+                      onClick={() =>
+                        (document.getElementById(
+                          "mobile-drawer"
+                        ).checked = false)
+                      }
+                    >
+                      <FaClipboardList className="mr-2" /> Assigned Parcel
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="allRider"
+                      onClick={() =>
+                        (document.getElementById(
+                          "mobile-drawer"
+                        ).checked = false)
+                      }
+                    >
+                      <FaUsers className="mr-2" /> All Rider
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="activeRider"
+                      onClick={() =>
+                        (document.getElementById(
+                          "mobile-drawer"
+                        ).checked = false)
+                      }
+                    >
+                      <FaUserCheck className="mr-2" /> Active Rider
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="pendingRider"
+                      onClick={() =>
+                        (document.getElementById(
+                          "mobile-drawer"
+                        ).checked = false)
+                      }
+                    >
+                      <FaUserClock className="mr-2" /> Pending Rider
+                    </Link>
+                  </li>
+                </>
+              )}
+
+              {role === "rider" && (
+                <li>
+                  <Link
+                    to="rider-pickup"
+                    onClick={() =>
+                      (document.getElementById("mobile-drawer").checked = false)
+                    }
+                  >
+                    <FaClipboardList className="mr-2" /> Rider Task
+                  </Link>
+                </li>
+              )}
+
               <li>
                 <Link
                   to="/"
@@ -231,7 +289,7 @@ const Dashboard = () => {
                     (document.getElementById("mobile-drawer").checked = false)
                   }
                 >
-                  <FaHome className="mr-2" /> Log Out
+                  <FaUserCircle className="mr-2" /> Log Out
                 </Link>
               </li>
             </ul>

@@ -7,7 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 const Hero = () => {
   return (
-      <div className="my-10">
+      <div className="md:my-10 my-2">
         <Carousel autoPlay={true} infiniteLoop={true} showArrows={true} showStatus={false} showThumbs={false} useKeyboardArrows={true}>
         <div>
           <img src={sliderImg01} alt="" />

@@ -41,6 +41,7 @@ const useAxiosSecure = () => {
         // Optionally: তুমি চাও user কে logout করে redirect করাতে
         if (status === 401 || status === 403) {
           location("/login")
+          console.log("forbiden assess")
         }
       } else {
         console.error("Network/server error:", error.message);

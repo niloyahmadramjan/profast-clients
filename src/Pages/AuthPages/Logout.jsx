@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 import AuthUser from "../../Hook/AuthUser";
 import Swal from "sweetalert2";
+import LoadingAnimation from "../LoaderAnimation/LoadingAnimation";
 
 const Logout = () => {
   const { signOutUser } = AuthUser();
@@ -15,10 +16,10 @@ const Logout = () => {
           icon: "success",
           title: "Log out successful!",
           showConfirmButton: false,
-          timer: 1500,
+          timer: 500,
         });
         // Redirect to homepage or login
-        setTimeout(() => navigate("/"), 1600);
+        setTimeout(() => navigate("/"));
       })
       .catch((error) => {
         Swal.fire({
@@ -29,13 +30,13 @@ const Logout = () => {
           timer: 1500,
         });
         // Optional: redirect anyway or stay on page
-        setTimeout(() => navigate("/"), 1600);
+        setTimeout(() => navigate("/"));
       });
   }, [signOutUser, navigate]);
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <p className="text-lg text-gray-600">Logging out...</p>
+     <LoadingAnimation></LoadingAnimation>
     </div>
   );
 };

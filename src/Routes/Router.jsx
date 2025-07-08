@@ -13,7 +13,7 @@ import AddParcel from "../Pages/AddParcel";
 // Route guards
 import PrivateRoutes from "./PrivateRoutes"; // for all logged in users
 import AdminRoute from "./AdminRoute"; // for admin
-// import RiderRoute from "./RiderRoute"; // for riders
+import RiderRoute from "./RiderRoute"; // for riders
 
 // Dashboard layouts and pages
 import Dashboard from "../Layout/Dashboard";
@@ -30,6 +30,9 @@ import PendingRider from "../Pages/UserDashBoard/Admin/PendingRider";
 import AdminManagement from "../Pages/UserDashBoard/Admin/AdminManagement ";
 import Unauthorized from "../Pages/Unauthorized";
 import PaidUnassignedParcels from "../Pages/UserDashBoard/Admin/PaidUnassignedParcels";
+import RiderPickup from "../Pages/UserDashBoard/Rider/RiderPickup";
+import RiderEarning from "../Pages/UserDashBoard/Rider/RiderEarning";
+import TotalEarning from "../Pages/UserDashBoard/Rider/TotalEarning";
 
 export const router = createBrowserRouter([
   {
@@ -193,9 +196,11 @@ export const router = createBrowserRouter([
         ),
       },
 
-      // 🔐 Optionally, you can add rider-only routes later using RiderRoute
+      // 🔐  rider-only routes 
       // Example:
-      // { path: "riderTasks", element: <RiderRoute><RiderTasks /></RiderRoute> },
+      { path: "rider-pickup", element: <RiderRoute><RiderPickup></RiderPickup></RiderRoute> },
+      { path: "rider-earning", element: <RiderRoute><RiderEarning></RiderEarning></RiderRoute> },
+      { path: "total-earning", element: <RiderRoute><TotalEarning></TotalEarning></RiderRoute> },
     ],
   },
 ]);

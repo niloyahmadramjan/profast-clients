@@ -21,55 +21,6 @@ const Navbar = () => {
           Home
         </NavLink>
       </li>
-
-      <li>
-        <NavLink
-          to="/coverage"
-          className={({ isActive }) =>
-            `transition-colors duration-200 font-medium ${
-              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
-            }`
-          }
-        >
-          Coverage
-        </NavLink>
-      </li>
-      <li>
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            `transition-colors duration-200 font-medium ${
-              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
-            }`
-          }
-        >
-          About Us
-        </NavLink>
-      </li>
-      <li>
-        <NavLink
-          to="/pricing"
-          className={({ isActive }) =>
-            `transition-colors duration-200 font-medium ${
-              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
-            }`
-          }
-        >
-          Pricing
-        </NavLink>
-      </li>
-      <li>
-        <NavLink
-          to="/riderApplicationForm"
-          className={({ isActive }) =>
-            `transition-colors duration-200 font-medium ${
-              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
-            }`
-          }
-        >
-          Be a Rider
-        </NavLink>
-      </li>
       {user && (
         <>
           <li>
@@ -86,6 +37,60 @@ const Navbar = () => {
               Add Parcel
             </NavLink>
           </li>
+        
+        </>
+      )}
+
+      <li>
+        <NavLink
+          to="/coverage"
+          className={({ isActive }) =>
+            `transition-colors duration-200 font-medium ${
+              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
+            }`
+          }
+        >
+          Coverage
+        </NavLink>
+      </li>
+      {/* <li>
+        <NavLink
+          to="/about"
+          className={({ isActive }) =>
+            `transition-colors duration-200 font-medium ${
+              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
+            }`
+          }
+        >
+          About Us
+        </NavLink>
+      </li> */}
+      {/* <li>
+        <NavLink
+          to="/pricing"
+          className={({ isActive }) =>
+            `transition-colors duration-200 font-medium ${
+              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
+            }`
+          }
+        >
+          Pricing
+        </NavLink>
+      </li> */}
+      <li>
+        <NavLink
+          to="/riderApplicationForm"
+          className={({ isActive }) =>
+            `transition-colors duration-200 font-medium ${
+              isActive ? "text-lime-500" : "text-gray-600 hover:text-lime-600"
+            }`
+          }
+        >
+          Be a Rider
+        </NavLink>
+      </li>
+      {user && (
+        <>
           <li>
             <NavLink
               to="/dashboard"
